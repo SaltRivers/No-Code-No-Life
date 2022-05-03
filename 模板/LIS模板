@@ -1,0 +1,88 @@
+//LIS（n2做法）：
+#include <iostream>
+using namespace std;
+const int MAXN = 1000 + 10;
+int n, data[MAXN];
+int dp[MAXN]; 
+int from[MAXN]; 
+void output(int x)
+{
+	if(!x)return;
+	output(from[x]);
+	cout<<data[x]<<" ";
+	//迭代输出 
+}
+int main()
+{
+	cin>>n;
+	for(int i=1;i<=n;i++)cin>>data[i];
+	
+	// DP
+	for(int i=1;i<=n;i++)
+	{
+		dp[i]=1;
+		from[i]=0;
+		for(int j=1;j<i;j++)
+		if(data[j]<data[i] && dp[i]<dp[j]+1)
+		{
+			dp[i]=dp[j]+1;
+			from[i]=j;//逐个记录前驱 
+		}
+	}
+	
+	int ans=dp[1], pos=1;
+	for(int i=1;i<=n;i++)
+		if(ans<dp[i])
+		{
+			ans=dp[i];
+			pos=i;//由于需要递归输出
+	//所以要记录最长上升子序列的最后一
+	//个元素，来不断回溯出路径来 
+		}
+	cout<<ans<<endl;
+	output(pos);
+	
+	return 0;
+}
+
+//树状数组（nlogn做法）：
+#include<bits/stdc++.h>
+using namespace std;
+const int maxm=1e5+5;
+int c[maxm];
+int f[maxm];
+int a[maxm];
+int lowbit(int i){
+    return i&-i;
+}
+void add(int i,int t){
+    while(i<maxm){
+        c[i]=max(c[i],t);
+        i+=lowbit(i);
+    }
+}
+int ask(int i){
+    int ans=0;
+    while(i){
+        ans=max(ans,c[i]);
+        i-=lowbit(i);
+    }
+    return ans;
+}
+signed main(){
+    int n;
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+    }
+    for(int i=1;i<=n;i++){
+        f[i]=ask(a[i])+1;
+        add(a[i],f[i]);
+    }
+    int ans=0;
+    for(int i=1;i<=n;i++){
+        ans=max(ans,f[i]);
+    }
+    cout<<ans<<endl;
+    return 0;
+}
